@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+body {
+  /* Your chosen gradient */
+  background: linear-gradient(135deg, #C94907, #F28C53);
+  
+  /* Prevents the gradient from tiling if content exceeds screen height */
+  background-attachment: fixed;
+  
+  /* Fallback color for very old browsers */
+  background-color: #C94907;
+
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Append this to the bottom of your styles.css */
+
+#flameCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* Keeps the effect in the background behind your content */
+  pointer-events: none; /* Allows clicking links and elements through the canvas */
+}
+
+header {
+    display: flex;
+}
+
+nav {
+    height: 80px;
+    display: flex;
+}
+
+img {
+    width: 100%;
+    height: auto;
+    padding: 20px;
+}
+
+button {
+    cursor: pointer;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+h2 {
+    font-size: 25px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style-type: none;
+}
+
+p {
+    line-height: 1.5;
+}
+
+.crossout {
+    text-decoration: line-through !important;
+    display: inline;
+}
+
+.not-allowed {
+    cursor: not-allowed;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.nav__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: #ff9900;
+    border-radius: 20px;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header__logo img {
+    width: 400px;
+    height: auto;
+    align-items: center;
+}
+
+.header__nav {
+    display: flex;
+    gap: 30px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__link a {
+    font-size: 25px;
+    font-weight: 800;
+    text-decoration: none;
+    text-align: center;
+}
+
+.header__link a:hover {
+    text-decoration: underline;
+}
+
+.about__image {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    margin-top: 100px;
+}
+
+.about__image img {
+    width: 80%;
+    height: auto !important;
+    max-height: none !important;
+    padding: 10px;
+}
