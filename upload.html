@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Artwork - Infernal Sun</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: rgb(245, 245, 245);">
+
+    <div class="modal__content" style="max-width: 500px; width: 90%;">
+        <h2 class="modal__title">Submit Artwork</h2>
+        <p class="modal__subtitle">Share your creation with Team Infernal Sun</p>
+
+        <form id="upload-form" onsubmit="handleFormSubmit(event)">
+            
+            <label style="display: block; text-align: left; margin-bottom: 6px; font-weight: bold; font-size: 14px;">Upload To</label>
+            <select id="category" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 16px; outline: none;" required>
+                <option value="gallery">General Gallery</option>
+                <option value="pets">Pets Showcase</option>
+            </select>
+
+            <label style="display: block; text-align: left; margin-bottom: 6px; font-weight: bold; font-size: 14px;">Discord Username</label>
+            <input type="text" id="discord_username" placeholder="e.g. DevelopmentUnit" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 16px; outline: none;" required>
+
+            <label style="display: block; text-align: left; margin-bottom: 6px; font-weight: bold; font-size: 14px;">Description</label>
+            <textarea id="description" rows="3" placeholder="Tell us about your upload..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 16px; outline: none; resize: vertical;" required></textarea>
+
+            <label style="display: block; text-align: left; margin-bottom: 6px; font-weight: bold; font-size: 14px;">Image File</label>
+            <input type="file" id="image_file" accept="image/*" style="width: 100%; margin-bottom: 20px;" required>
+
+            <button type="submit" id="submit-btn" class="modal__btn click">Submit for Review</button>
+        </form>
+
+        <p id="status-message" style="margin-top: 15px; font-weight: bold; font-size: 14px;"></p>
+        <p style="margin-top: 15px;"><a href="index.html" class="orange" style="font-size: 14px;">← Back to Home</a></p>
+    </div>
+
+    <script>
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        
+        const status = document.getElementById("status-message");
+        const submitBtn = document.getElementById("submit-btn");
+        const fileInput = document.getElementById("image_file");
+        const file = fileInput.files[0];
+
+        if (!file) {
+            status.style.color = "#e74c3c";
+            status.textContent = "Please select an image file.";
+            return;
+        }
+
+        const rawDiscord = document.getElementById("discord_username").value.trim();
+        const cleanDiscord = rawDiscord.startsWith('@') ? rawDiscord.slice(1) : rawDiscord;
+
+        status.style.color = "#242424";
+        status.textContent = "Authorizing upload...";
+        submitBtn.disabled = true;
+
+        try {
+            // 1. Fetch Presigned URL from your home server API
+            const urlRes = await fetch("https://infernalsun.firecloud-tech.com/api/get-upload-url", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    fileType: file.type,
+                    category: document.getElementById("category").value 
+                })
+            });
+
+            if (!urlRes.ok) throw new Error("Failed to authorize upload link.");
+            const { uploadUrl, publicImageUrl } = await urlRes.json();
+
+            // 2. Direct Upload to Cloudflare R2
+            status.textContent = "Uploading image directly to storage...";
+            const uploadRes = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: { "Content-Type": file.type },
+                body: file
+            });
+
+            if (!uploadRes.ok) throw new Error("Image upload to R2 failed.");
+
+            // 3. Save Pending Submission Metadata in Postgres
+            status.textContent = "Saving submission...";
+            const subRes = await fetch("https://infernalsun.firecloud-tech.com/api/submissions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    discord_username: cleanDiscord,
+                    description: document.getElementById("description").value,
+                    category: document.getElementById("category").value,
+                    image_url: publicImageUrl
+                })
+            });
+
+            if (!subRes.ok) throw new Error("Failed to record submission.");
+
+            status.style.color = "green";
+            status.textContent = "Success! Uploaded and awaiting admin approval.";
+            document.getElementById("upload-form").reset();
+
+        } catch (err) {
+            status.style.color = "#e74c3c";
+            status.textContent = err.message || "An error occurred during submission.";
+            console.error(err);
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+    </script>
+</body>
+</html>
