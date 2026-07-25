@@ -5,59 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infernal Sun</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="assets/images/favicon/favicon.ico">
+    <script src="https://kit.fontawesome.com/66e0a4dc21.js" crossorigin="anonymous"></script>
     <script src="app.js" defer></script>
 </head>
 <body>
-    <canvas id="flameCanvas"></canvas>
-
-    <header>
-        <container class="nav__container animate-container">
-            <div class="row slide-right">
-                <div class="header__logo">
-                    <img src="assets/images/infernal-sun-icon.png" class="header__logo--img" alt="Team Name Icon">
-                </div>
-
-                <div class="nav">
-                    <ul class="header__nav">
-                        <li class="header__link">
-                            <a href="#about">About</a>
-                        </li>
-
-                        <li class="header__link">
-                            <a href="#gallery">Gallery</a>
-                        </li>
-
-                        <li class="header__link">
-                            <a href="#more-info">More Info</a>
-                        </li>
-
-                        <li class="header__link">
-                            <a href="#pets">Pets</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </container>
-    </header>
-
-    <main>
-        <div id="about" class="container">
-            <div class="row">
-                <div class="about__image">
-                    <h1 class="about__container--title">Welcome to Infernal Sun!</h1>
-                    <h2 class="about__container--description">The <span class="crossout">official</span> unofficial site to view all of the artwork/talent of the Infernal Sun Team!</h2>
-                    <img src="assets/images/banner-image.png" class="about__container--img" alt="Main Banner Image">
-                </div>
-            </div>
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="modal">
+        <div class="modal__content">
+            <span class="modal__close" onclick="closeModal()">&times;</span>
+            <h2 class="modal__title">Team Access</h2>
+            <p class="modal__subtitle">Please enter password to show off your artwork:</p>
+            
+            <form onsubmit="handleAuth(event)">
+                <input type="password" id="modal-password" placeholder="Password" required>
+                <p id="modal-error" class="modal__error"></p>
+                <button type="submit" class="modal__btn click">Submit</button>
+            </form>
         </div>
+    </div>
 
-        <div id="gallery" class="container">
-            <div class="row">
-                <div class="gallery__container">
-                    <h2 class="gallery__container--title">Gallery</h2>
-                </div>
+    <section id="landing-page">
+        <nav>
+            <figure>
+                <img id="main-logo" src="assets/images/infernal-sun-icon.png" alt="">
+            </figure>
+            <ul class="nav__link--list">
+                <li class="nav__link">
+                    <a href="#" class="nav__link--anchor link__hover-effect link__hover-effect--black">About</a>
+                </li>
+                <li class="nav__link">
+                    <a href="#gallery" onclick="loadGallery('gallery')" class="nav__link--anchor link__hover-effect link__hover-effect--black">Gallery</a>
+                </li>
+                <li class="nav__link">
+                    <a href="#pets" onclick="loadGallery('pets')" class="nav__link--anchor link__hover-effect link__hover-effect--black">Pets</a>
+                </li>
+                <li class="nav__link">
+                    <a href="#" onclick="openModal(); return false;" class="nav__link--anchor link__hover-effect link__hover-effect--black orange">Upload</a>
+                </li>
+                <li class="nav__link click">
+                    <a href="#" class="nav__link--anchor link__hover-effect link__hover-effect--black"><i class="fa-solid fa-circle-half-stroke"></i></a>
+                </li>
+            </ul>
+        </nav>
+
+        <header class="header">
+            <div class="header__content">
+                <h1 class="title">Welcome to the <span class="crossout">official</span> unofficial <span class="orange">Infernal Sun</span> website!</h1>
+                <p class="header__para">Here you will find all of the great artwork and other great things team <span class="orange">Infernal Sun</span> has created!</p>
             </div>
+
+            <div class="header__image">
+                <img src="assets/images/banner-image.png" alt="">
+            </div>
+
+            <a href="#gallery" class="scroll">
+                <div class="scroll__icon click"></div>
+            </a>
+        </header>
+    </section>
+
+    <!-- GALLERY SECTION -->
+    <section id="gallery">
+        <div class="gallery__cards" id="gallery-container">
+            <!-- Dynamic submissions from database will inject here -->
         </div>
-    </main>
+    </section>
 </body>
 </html>
