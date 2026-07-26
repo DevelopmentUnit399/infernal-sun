@@ -67,7 +67,7 @@ section {
 
 /*
 
-PASSWORD PROMPT
+PASSWORD & UPLOAD MODAL
 
 */
 
@@ -94,7 +94,7 @@ PASSWORD PROMPT
     padding: 40px;
     border-radius: 12px;
     width: 90%;
-    max-width: 400px;
+    max-width: 440px;
     position: relative;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -158,6 +158,64 @@ PASSWORD PROMPT
     font-size: 14px;
     margin-bottom: 12px;
     display: none;
+}
+
+/* 
+
+UPLOAD FORM FIELD STYLING 
+
+*/
+
+.modal__form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+    width: 100%;
+    text-align: left;
+}
+
+.modal__form-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal__input,
+.modal__textarea,
+.modal__select,
+.modal__file-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: border-color 200ms ease;
+}
+
+.modal__input:focus,
+.modal__textarea:focus,
+.modal__select:focus {
+    border-color: orange;
+}
+
+.modal__textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal__select {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.modal__file-input {
+    background-color: #fafafa;
+    padding: 10px;
+    cursor: pointer;
 }
 
 /*
