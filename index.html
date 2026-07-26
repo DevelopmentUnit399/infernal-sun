@@ -29,38 +29,41 @@
 
             <!-- STEP 2: UPLOAD FORM (Shown after correct password) -->
             <!-- STEP 2: UPLOAD FORM -->
-            <div id="modal-step-upload" style="display: none;">
-                <h2 class="modal__title">Submit Artwork</h2>
-                <p class="modal__subtitle">Fill in your details to upload your image:</p>
-                
-                <form onsubmit="handleUpload(event)" class="modal__form">
-                    <div class="modal__form-group">
-                        <input type="text" id="upload-username" class="modal__input" placeholder="Discord Username" required>
-                    </div>
+            <!-- STEP 2: UPLOAD FORM -->
+<div id="modal-step-upload" style="display: none;">
+    <h2 class="modal__title">Submit Artwork</h2>
+    <p class="modal__subtitle">Fill in your details to upload your image:</p>
+    
+    <form onsubmit="handleUpload(event)" class="modal__form">
+        <div class="modal__form-group">
+            <input type="text" id="upload-username" class="modal__input" placeholder="Discord Username" required>
+        </div>
 
-                    <div class="modal__form-group">
-                        <input type="email" id="upload-email" class="modal__input" placeholder="Email Address (For Status Updates)" required>
-                    </div>
+        <div class="modal__form-group">
+            <input type="email" id="upload-email" class="modal__input" placeholder="Email Address (For Status Updates)" required>
+        </div>
 
-                    <div class="modal__form-group">
-                        <textarea id="upload-description" class="modal__textarea" placeholder="Description of your artwork..." rows="3" required></textarea>
-                    </div>
+        <div class="modal__form-group">
+            <textarea id="upload-description" class="modal__textarea" placeholder="Description of your artwork..." rows="3" required></textarea>
+        </div>
 
-                    <div class="modal__form-group">
-                        <select id="upload-category" class="modal__select" required>
-                            <option value="gallery">Gallery Page</option>
-                            <option value="pets">Pet Page</option>
-                        </select>
-                    </div>
+        <div class="modal__form-group">
+            <select id="upload-category" class="modal__select" required>
+                <option value="gallery">Gallery Page</option>
+                <option value="pets">Pet Page</option>
+            </select>
+        </div>
 
-                    <div class="modal__form-group">
-                        <input type="file" id="upload-file" class="modal__file-input" accept="image/*" required>
-                    </div>
+        <div class="modal__form-group">
+            <input type="file" id="upload-file" class="modal__file-input" accept="image/*" required>
+        </div>
 
-                    <p id="upload-status" class="modal__error" style="color: #666;"></p>
-                    <button type="submit" id="upload-btn" class="modal__btn click">Upload & Submit</button>
-                </form>
-            </div>
+        <button type="submit" id="upload-btn" class="modal__btn click">Upload & Submit</button>
+        
+        <!-- Status text container placed below button for clear visibility -->
+        <p id="upload-status" style="margin-top: 12px; font-weight: 500; text-align: center; font-size: 0.95rem; min-height: 1.2em;"></p>
+    </form>
+</div>
 
         </div>
     </div>
