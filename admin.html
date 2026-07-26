@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Moderation - Infernal Sun</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="admin.js" defer></script>
 </head>
 <body style="padding: 40px; background-color: #f5f5f5;">
 
@@ -23,131 +24,25 @@
     </div>
 
     <!-- MAIN ADMIN DASHBOARD -->
-    <div id="admin-dashboard" style="display: none; max-width: 900px; margin: 0 auto;">
-        <h1 style="margin-bottom: 20px;">Pending Submissions</h1>
-        <div id="pending-list">Loading pending submissions...</div>
+    <div id="admin-dashboard" style="display: none; max-width: 1000px; margin: 0 auto;">
+        <h1 style="margin-bottom: 30px; font-size: 2rem; color: #2c3e50;">Admin Moderation Panel</h1>
+
+        <!-- PENDING SUBMISSIONS SECTION -->
+        <section class="admin-section">
+            <h2>Pending Submissions</h2>
+            <div id="pending-submissions" class="admin-grid">
+                <!-- Pending items render here -->
+            </div>
+        </section>
+
+        <!-- APPROVED SUBMISSIONS SECTION -->
+        <section class="admin-section" style="margin-top: 40px;">
+            <h2>Approved Submissions (Manage Live Gallery)</h2>
+            <div id="approved-submissions" class="admin-grid">
+                <!-- Approved items render here -->
+            </div>
+        </section>
     </div>
 
-    <script>
-    let currentAdminKey = "";
-    const API_BASE = "https://infernalsun.firecloud-tech.com";
-
-    async function handleAdminAuth(event) {
-        event.preventDefault();
-        
-        const passwordInput = document.getElementById("admin-password");
-        const errorText = document.getElementById("admin-error");
-        const loginBtn = document.getElementById("admin-login-btn");
-
-        currentAdminKey = passwordInput.value.trim();
-        if (!currentAdminKey) return;
-
-        errorText.style.display = "none";
-        loginBtn.disabled = true;
-        loginBtn.textContent = "Verifying...";
-
-        try {
-            await fetchPending();
-        } catch (err) {
-            errorText.textContent = "Unable to reach server API.";
-            errorText.style.display = "block";
-            console.error("Auth Exception:", err);
-        } finally {
-            loginBtn.disabled = false;
-            loginBtn.textContent = "Login";
-        }
-    }
-
-    async function fetchPending() {
-        const container = document.getElementById("pending-list");
-        const errorText = document.getElementById("admin-error");
-
-        const res = await fetch(`${API_BASE}/api/admin/pending`, {
-            method: "GET",
-            headers: { 
-                "x-admin-key": currentAdminKey 
-            }
-        });
-
-        if (res.status === 401) {
-            errorText.textContent = "Incorrect password.";
-            errorText.style.display = "block";
-            return;
-        }
-
-        if (!res.ok) {
-            throw new Error(`Server returned status ${res.status}`);
-        }
-
-        // Authentication successful! Reveal dashboard and hide modal
-        document.getElementById("auth-modal").classList.remove("modal--open");
-        document.getElementById("auth-modal").style.display = "none";
-        document.getElementById("admin-dashboard").style.display = "block";
-
-        const items = await res.json();
-
-        if (!Array.isArray(items) || items.length === 0) {
-            container.innerHTML = "<p style='color: #666; font-size: 18px;'>No pending submissions to approve!</p>";
-            return;
-        }
-
-        container.innerHTML = items.map(item => `
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <img src="${item.image_url}" style="width: 200px; height: auto; border-radius: 6px; max-height: 200px; object-fit: cover;">
-                <div style="flex: 1;">
-                    <h3 style="margin-bottom: 6px; font-size: 22px;">${item.discord_username} <span style="font-size: 14px; color: #888;">(${item.category})</span></h3>
-                    <p style="margin-bottom: 8px; font-size: 14px; color: #666;"><strong>Email:</strong> ${item.email || 'Not provided'}</p>
-                    <p style="margin-bottom: 16px; font-size: 16px; color: #444;">${item.description}</p>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="approveItem('${item.id}')" style="background: #27ae60; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px;">Approve</button>
-                        <button onclick="declineItem('${item.id}')" style="background: #e74c3c; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px;">Decline & Delete</button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    async function approveItem(id) {
-        try {
-            const res = await fetch(`${API_BASE}/api/admin/approve/${id}`, { 
-                method: "POST",
-                headers: { 
-                    "x-admin-key": currentAdminKey 
-                }
-            });
-
-            if (res.ok) {
-                fetchPending();
-            } else {
-                alert("Failed to approve item.");
-            }
-        } catch (err) {
-            alert("Failed to approve submission.");
-            console.error(err);
-        }
-    }
-
-    async function declineItem(id) {
-        if (!confirm("Are you sure you want to decline this submission? This will permanently delete the image from R2 and send a notification email.")) return;
-
-        try {
-            const res = await fetch(`${API_BASE}/api/admin/decline/${id}`, { 
-                method: "POST",
-                headers: { 
-                    "x-admin-key": currentAdminKey 
-                }
-            });
-
-            if (res.ok) {
-                fetchPending();
-            } else {
-                alert("Failed to decline item.");
-            }
-        } catch (err) {
-            alert("Failed to decline submission.");
-            console.error(err);
-        }
-    }
-    </script>
 </body>
 </html>
