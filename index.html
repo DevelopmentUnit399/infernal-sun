@@ -10,18 +10,48 @@
     <script src="app.js" defer></script>
 </head>
 <body>
-    <!-- AUTH MODAL -->
+    <!-- AUTH & UPLOAD MODAL -->
     <div id="auth-modal" class="modal">
         <div class="modal__content">
             <span class="modal__close" onclick="closeModal()">&times;</span>
-            <h2 class="modal__title">Team Access</h2>
-            <p class="modal__subtitle">Please enter password to show off your artwork:</p>
             
-            <form onsubmit="handleAuth(event)">
-                <input type="password" id="modal-password" placeholder="Password" required>
-                <p id="modal-error" class="modal__error"></p>
-                <button type="submit" class="modal__btn click">Submit</button>
-            </form>
+            <!-- STEP 1: PASSWORD GATE -->
+            <div id="modal-step-auth">
+                <h2 class="modal__title">Team Access</h2>
+                <p class="modal__subtitle">Please enter password to show off your artwork:</p>
+                
+                <form onsubmit="handleAuth(event)">
+                    <input type="password" id="modal-password" placeholder="Password" required>
+                    <p id="modal-error" class="modal__error"></p>
+                    <button type="submit" class="modal__btn click">Submit</button>
+                </form>
+            </div>
+
+            <!-- STEP 2: UPLOAD FORM (Shown after correct password) -->
+            <div id="modal-step-upload" style="display: none;">
+                <h2 class="modal__title">Submit Artwork</h2>
+                <p class="modal__subtitle">Fill in your details to upload your image:</p>
+                
+                <form onsubmit="handleUpload(event)">
+                    <input type="text" id="upload-username" placeholder="Discord Username" required>
+                    
+                    <!-- NEW EMAIL INPUT FIELD -->
+                    <input type="email" id="upload-email" placeholder="Email Address (For Status Updates)" required>
+                    
+                    <textarea id="upload-description" placeholder="Description of your artwork..." rows="3" required></textarea>
+                    
+                    <select id="upload-category" required>
+                        <option value="gallery">Gallery</option>
+                        <option value="pets">Pets</option>
+                    </select>
+
+                    <input type="file" id="upload-file" accept="image/*" required>
+                    
+                    <p id="upload-status" class="modal__error" style="color: #666;"></p>
+                    <button type="submit" id="upload-btn" class="modal__btn click">Upload & Submit</button>
+                </form>
+            </div>
+
         </div>
     </div>
 

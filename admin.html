@@ -77,9 +77,13 @@
                 <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                     <img src="${item.image_url}" style="width: 200px; height: auto; border-radius: 6px; max-height: 200px; object-fit: cover;">
                     <div style="flex: 1;">
-                        <h3 style="margin-bottom: 8px; font-size: 22px;">${item.discord_username} <span style="font-size: 14px; color: #888;">(${item.category})</span></h3>
+                        <h3 style="margin-bottom: 6px; font-size: 22px;">${item.discord_username} <span style="font-size: 14px; color: #888;">(${item.category})</span></h3>
+                        <p style="margin-bottom: 8px; font-size: 14px; color: #666;"><strong>Email:</strong> ${item.email || 'Not provided'}</p>
                         <p style="margin-bottom: 16px; font-size: 16px; color: #444;">${item.description}</p>
-                        <button onclick="approveItem('${item.id}')" style="background: #27ae60; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px;">Approve</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="approveItem('${item.id}')" style="background: #27ae60; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px;">Approve</button>
+                            <button onclick="declineItem('${item.id}')" style="background: #e74c3c; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px;">Decline & Delete</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -107,6 +111,29 @@
             }
         } catch (err) {
             alert("Failed to approve submission.");
+            console.error(err);
+        }
+    }
+
+    async function declineItem(id) {
+        if (!confirm("Are you sure you want to decline this submission? This will permanently delete the image from R2 and send a notification email.")) return;
+
+        try {
+            // Pass x-admin-key header to decline route
+            const res = await fetch(`${API_BASE}/api/admin/decline/${id}`, { 
+                method: "POST",
+                headers: { 
+                    "x-admin-key": currentAdminKey 
+                }
+            });
+
+            if (res.ok) {
+                fetchPending(); // Reload queue
+            } else {
+                alert("Failed to decline item.");
+            }
+        } catch (err) {
+            alert("Failed to decline submission.");
             console.error(err);
         }
     }
