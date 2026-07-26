@@ -1,6 +1,9 @@
 const TEAM_PASSWORD = "CalamityAshe";
 const API_BASE = "https://infernalsun.firecloud-tech.com";
 
+// Module-level lock to prevent double execution
+let isUploading = false;
+
 // --- AUTH & UPLOAD MODAL CONTROLS ---
 
 function openModal() {
@@ -33,26 +36,32 @@ function closeModal() {
   if (uploadForm) uploadForm.reset();
   
   const statusText = document.getElementById("upload-status");
-  if (statusText) statusText.textContent = "";
+  if (statusText) {
+    statusText.textContent = "";
+    statusText.style.color = "#666";
+  }
 
   const uploadBtn = document.getElementById("upload-btn");
   if (uploadBtn) {
     uploadBtn.disabled = false;
-    uploadBtn.textContent = "Submit Artwork";
+    uploadBtn.textContent = "Upload & Submit";
   }
+
+  // Reset upload execution flag
+  isUploading = false;
 }
 
 function handleAuth(event) {
-  event.preventDefault();
+  if (event) event.preventDefault();
 
-  const passwordInput = document.getElementById("modal-password").value;
+  const passwordInput = document.getElementById("modal-password")?.value || "";
   const errorText = document.getElementById("modal-error");
 
   if (passwordInput === TEAM_PASSWORD) {
     // Hide password step and show upload form step inside the modal
     document.getElementById("modal-step-auth").style.display = "none";
     document.getElementById("modal-step-upload").style.display = "block";
-  } else {
+  } else if (errorText) {
     errorText.textContent = "Incorrect password. Please try again.";
     errorText.style.display = "block";
   }
@@ -69,8 +78,12 @@ window.addEventListener("click", (event) => {
 // --- SUBMISSION & R2 UPLOAD HANDLER ---
 
 async function handleUpload(event) {
-  event.preventDefault();
+  if (event) event.preventDefault();
   
+  // HARD LOCK: If already processing an upload, exit immediately!
+  if (isUploading) return;
+  isUploading = true;
+
   const statusText = document.getElementById("upload-status");
   const uploadBtn = document.getElementById("upload-btn");
 
@@ -83,23 +96,21 @@ async function handleUpload(event) {
 
   if (!file) {
     if (statusText) {
-      statusText.style.color = "red";
+      statusText.style.color = "#e74c3c";
       statusText.textContent = "Please select a file to upload.";
     }
+    isUploading = false;
     return;
   }
-
-  // Preserve original button text to reset later
-  const originalBtnText = uploadBtn ? uploadBtn.textContent : "Submit";
 
   try {
     if (uploadBtn) {
       uploadBtn.disabled = true;
-      uploadBtn.textContent = "Uploading...";
+      uploadBtn.textContent = "Processing...";
     }
     if (statusText) {
-      statusText.style.color = "#666";
-      statusText.textContent = "Getting secure upload link...";
+      statusText.style.color = "#e67e22";
+      statusText.textContent = "Generating secure upload link...";
     }
 
     // 1. Get Presigned URL from Backend
@@ -113,17 +124,17 @@ async function handleUpload(event) {
     const { uploadUrl, publicImageUrl } = await presignRes.json();
 
     // 2. Upload file directly to Cloudflare R2
-    if (statusText) statusText.textContent = "Uploading artwork to R2 storage...";
+    if (statusText) statusText.textContent = "Uploading image to R2 storage...";
     const uploadRes = await fetch(uploadUrl, {
       method: "PUT",
       headers: { "Content-Type": file.type },
       body: file
     });
 
-    if (!uploadRes.ok) throw new Error("Image upload to R2 failed.");
+    if (!uploadRes.ok) throw new Error("Image upload to Cloudflare R2 failed.");
 
     // 3. Save submission record to Database
-    if (statusText) statusText.textContent = "Saving submission record...";
+    if (statusText) statusText.textContent = "Saving submission details...";
     const subRes = await fetch(`${API_BASE}/api/submissions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -138,9 +149,11 @@ async function handleUpload(event) {
 
     if (subRes.ok) {
       if (statusText) {
-        statusText.style.color = "green";
+        statusText.style.color = "#2ecc71";
         statusText.textContent = "Upload successful! Waiting for admin approval.";
       }
+      if (uploadBtn) uploadBtn.textContent = "Submitted!";
+
       setTimeout(() => { 
         closeModal(); 
       }, 2500);
@@ -151,14 +164,14 @@ async function handleUpload(event) {
   } catch (err) {
     console.error("Upload error:", err);
     if (statusText) {
-      statusText.style.color = "red";
+      statusText.style.color = "#e74c3c";
       statusText.textContent = err.message || "An error occurred during upload.";
     }
-  } finally {
     if (uploadBtn) {
       uploadBtn.disabled = false;
-      uploadBtn.textContent = originalBtnText;
+      uploadBtn.textContent = "Upload & Submit";
     }
+    isUploading = false; // Reset lock on failure so user can try again
   }
 }
 
@@ -204,13 +217,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load gallery items on page start
   loadGallery('gallery');
 
-  // Bind Auth Password form submit
+  // Bind Auth Password form submit safely
   const authForm = document.querySelector("#modal-step-auth form");
   if (authForm) {
     authForm.addEventListener("submit", handleAuth);
   }
 
-  // Bind Upload form submit automatically
+  // Bind Upload form submit safely
   const uploadForm = document.querySelector("#modal-step-upload form");
   if (uploadForm) {
     uploadForm.addEventListener("submit", handleUpload);
