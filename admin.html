@@ -29,42 +29,57 @@
     </div>
 
     <script>
-    const ADMIN_PASSWORD = "CalamityAshe"; // Change this if you want a separate admin key
+    let currentAdminKey = "";
     const API_BASE = "https://infernalsun.firecloud-tech.com";
 
     function handleAdminAuth(event) {
         event.preventDefault();
-        const input = document.getElementById("admin-password").value;
-        const errorText = document.getElementById("admin-error");
-
-        if (input === ADMIN_PASSWORD) {
-            document.getElementById("auth-modal").classList.remove("modal--open");
-            document.getElementById("admin-dashboard").style.display = "block";
-            fetchPending();
-        } else {
-            errorText.textContent = "Incorrect password.";
-            errorText.style.display = "block";
-        }
+        // Capture password entered into modal
+        currentAdminKey = document.getElementById("admin-password").value;
+        
+        // Let the backend verify the password against ADMIN_PASSWORD in docker-compose.yml
+        fetchPending();
     }
 
     async function fetchPending() {
         const container = document.getElementById("pending-list");
+        const errorText = document.getElementById("admin-error");
+
         try {
-            const res = await fetch(`${API_BASE}/api/admin/pending`);
+            // Pass x-admin-key header to authorize with index.js
+            const res = await fetch(`${API_BASE}/api/admin/pending`, {
+                headers: { 
+                    "x-admin-key": currentAdminKey 
+                }
+            });
+
+            // Handle invalid password response from Node.js
+            if (res.status === 401) {
+                errorText.textContent = "Incorrect password.";
+                errorText.style.display = "block";
+                return;
+            }
+
+            if (!res.ok) throw new Error("Failed to load submissions.");
+
+            // Password matched on backend! Unlock admin dashboard
+            document.getElementById("auth-modal").classList.remove("modal--open");
+            document.getElementById("admin-dashboard").style.display = "block";
+
             const items = await res.json();
 
             if (items.length === 0) {
-                container.innerHTML = "<p>No pending submissions to approve!</p>";
+                container.innerHTML = "<p style='color: #666; font-size: 18px;'>No pending submissions to approve!</p>";
                 return;
             }
 
             container.innerHTML = items.map(item => `
                 <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <img src="${item.image_url}" style="width: 200px; height: auto; border-radius: 6px;">
+                    <img src="${item.image_url}" style="width: 200px; height: auto; border-radius: 6px; max-height: 200px; object-fit: cover;">
                     <div style="flex: 1;">
-                        <h3>${item.discord_username} <span style="font-size: 14px; color: #888;">(${item.category})</span></h3>
-                        <p style="margin: 10px 0;">${item.description}</p>
-                        <button onclick="approveItem('${item.id}')" style="background: #27ae60; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Approve</button>
+                        <h3 style="margin-bottom: 8px; font-size: 22px;">${item.discord_username} <span style="font-size: 14px; color: #888;">(${item.category})</span></h3>
+                        <p style="margin-bottom: 16px; font-size: 16px; color: #444;">${item.description}</p>
+                        <button onclick="approveItem('${item.id}')" style="background: #27ae60; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px;">Approve</button>
                     </div>
                 </div>
             `).join('');
@@ -77,12 +92,22 @@
 
     async function approveItem(id) {
         try {
-            const res = await fetch(`${API_BASE}/api/admin/approve/${id}`, { method: "POST" });
+            // Pass x-admin-key header to approve route
+            const res = await fetch(`${API_BASE}/api/admin/approve/${id}`, { 
+                method: "POST",
+                headers: { 
+                    "x-admin-key": currentAdminKey 
+                }
+            });
+
             if (res.ok) {
-                fetchPending();
+                fetchPending(); // Reload queue
+            } else {
+                alert("Failed to approve item.");
             }
         } catch (err) {
             alert("Failed to approve submission.");
+            console.error(err);
         }
     }
     </script>
