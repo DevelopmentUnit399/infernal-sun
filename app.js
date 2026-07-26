@@ -79,9 +79,14 @@ window.addEventListener("click", (event) => {
 
 async function handleUpload(event) {
   if (event) event.preventDefault();
-  
+
+  console.log("--> handleUpload triggered!");
+
   // HARD LOCK: If already processing an upload, exit immediately!
-  if (isUploading) return;
+  if (isUploading) {
+    console.log("Upload already in progress, skipping execution.");
+    return;
+  }
   isUploading = true;
 
   const statusText = document.getElementById("upload-status");
@@ -93,6 +98,8 @@ async function handleUpload(event) {
   const category = document.getElementById("upload-category")?.value || "gallery";
   const fileInput = document.getElementById("upload-file");
   const file = fileInput?.files[0];
+
+  console.log("Payload parameters:", { discord_username, email, category, fileName: file?.name });
 
   if (!file) {
     if (statusText) {
@@ -114,6 +121,7 @@ async function handleUpload(event) {
     }
 
     // 1. Get Presigned URL from Backend
+    console.log("Fetching presigned upload URL...");
     const presignRes = await fetch(`${API_BASE}/api/get-upload-url`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -122,9 +130,11 @@ async function handleUpload(event) {
 
     if (!presignRes.ok) throw new Error("Failed to generate upload link.");
     const { uploadUrl, publicImageUrl } = await presignRes.json();
+    console.log("Presigned URL received:", publicImageUrl);
 
     // 2. Upload file directly to Cloudflare R2
     if (statusText) statusText.textContent = "Uploading image to R2 storage...";
+    console.log("Uploading file to Cloudflare R2...");
     const uploadRes = await fetch(uploadUrl, {
       method: "PUT",
       headers: { "Content-Type": file.type },
@@ -132,9 +142,11 @@ async function handleUpload(event) {
     });
 
     if (!uploadRes.ok) throw new Error("Image upload to Cloudflare R2 failed.");
+    console.log("R2 Upload complete!");
 
     // 3. Save submission record to Database
     if (statusText) statusText.textContent = "Saving submission details...";
+    console.log("Saving submission entry to server backend...");
     const subRes = await fetch(`${API_BASE}/api/submissions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -148,6 +160,7 @@ async function handleUpload(event) {
     });
 
     if (subRes.ok) {
+      console.log("Submission saved successfully!");
       if (statusText) {
         statusText.style.color = "#2ecc71";
         statusText.textContent = "Upload successful! Waiting for admin approval.";
@@ -171,7 +184,8 @@ async function handleUpload(event) {
       uploadBtn.disabled = false;
       uploadBtn.textContent = "Upload & Submit";
     }
-    isUploading = false; // Reset lock on failure so user can try again
+  } finally {
+    isUploading = false; // Always release lock
   }
 }
 
@@ -211,21 +225,16 @@ async function loadGallery(category = 'gallery') {
   }
 }
 
+// --- GLOBAL SCOPE EXPORTS ---
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.handleAuth = handleAuth;
+window.handleUpload = handleUpload;
+window.loadGallery = loadGallery;
+
 // --- DOM INITIALIZATION ---
 
 document.addEventListener("DOMContentLoaded", () => {
   // Load gallery items on page start
   loadGallery('gallery');
-
-  // Bind Auth Password form submit safely
-  const authForm = document.querySelector("#modal-step-auth form");
-  if (authForm) {
-    authForm.addEventListener("submit", handleAuth);
-  }
-
-  // Bind Upload form submit safely
-  const uploadForm = document.querySelector("#modal-step-upload form");
-  if (uploadForm) {
-    uploadForm.addEventListener("submit", handleUpload);
-  }
 });
