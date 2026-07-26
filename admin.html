@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Moderation - Infernal Sun</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="padding: 40px; background-color: #f5f5f5;">
+
+    <!-- ADMIN AUTH MODAL -->
+    <div id="auth-modal" class="modal modal--open">
+        <div class="modal__content">
+            <h2 class="modal__title">Admin Access</h2>
+            <p class="modal__subtitle">Enter password to view pending submissions:</p>
+            
+            <form onsubmit="handleAdminAuth(event)">
+                <input type="password" id="admin-password" placeholder="Password" required>
+                <p id="admin-error" class="modal__error"></p>
+                <button type="submit" class="modal__btn click">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN ADMIN DASHBOARD -->
+    <div id="admin-dashboard" style="display: none; max-width: 900px; margin: 0 auto;">
+        <h1 style="margin-bottom: 20px;">Pending Submissions</h1>
+        <div id="pending-list">Loading pending submissions...</div>
+    </div>
+
+    <script>
+    const ADMIN_PASSWORD = "CalamityAshe"; // Change this if you want a separate admin key
+    const API_BASE = "https://infernalsun.firecloud-tech.com";
+
+    function handleAdminAuth(event) {
+        event.preventDefault();
+        const input = document.getElementById("admin-password").value;
+        const errorText = document.getElementById("admin-error");
+
+        if (input === ADMIN_PASSWORD) {
+            document.getElementById("auth-modal").classList.remove("modal--open");
+            document.getElementById("admin-dashboard").style.display = "block";
+            fetchPending();
+        } else {
+            errorText.textContent = "Incorrect password.";
+            errorText.style.display = "block";
+        }
+    }
+
+    async function fetchPending() {
+        const container = document.getElementById("pending-list");
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/pending`);
+            const items = await res.json();
+
+            if (items.length === 0) {
+                container.innerHTML = "<p>No pending submissions to approve!</p>";
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <img src="${item.image_url}" style="width: 200px; height: auto; border-radius: 6px;">
+                    <div style="flex: 1;">
+                        <h3>${item.discord_username} <span style="font-size: 14px; color: #888;">(${item.category})</span></h3>
+                        <p style="margin: 10px 0;">${item.description}</p>
+                        <button onclick="approveItem('${item.id}')" style="background: #27ae60; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Approve</button>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (err) {
+            container.innerHTML = "<p style='color: red;'>Failed to load pending items.</p>";
+            console.error(err);
+        }
+    }
+
+    async function approveItem(id) {
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/approve/${id}`, { method: "POST" });
+            if (res.ok) {
+                fetchPending();
+            }
+        } catch (err) {
+            alert("Failed to approve submission.");
+        }
+    }
+    </script>
+</body>
+</html>
