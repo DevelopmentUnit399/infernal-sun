@@ -191,8 +191,10 @@ async function handleUpload(event) {
 
 // --- PUBLIC GALLERY LOADER ---
 
-async function loadGallery(category = 'gallery') {
-  const container = document.getElementById("gallery-container");
+// --- PUBLIC GALLERY LOADER ---
+
+async function loadGallery(category = 'gallery', containerId = 'gallery-container') {
+  const container = document.getElementById(containerId);
   if (!container) return;
 
   try {
@@ -202,7 +204,7 @@ async function loadGallery(category = 'gallery') {
     if (!Array.isArray(items) || items.length === 0) {
       container.innerHTML = `
         <header class="header">
-          <p style="text-align: center; width: 100%; color: #888;">No submissions approved yet for this section.</p>
+          <p style="text-align: center; width: 100%; color: #888; padding: 20px;">No submissions approved yet for this section.</p>
         </header>`;
       return;
     }
@@ -210,8 +212,14 @@ async function loadGallery(category = 'gallery') {
     container.innerHTML = items.map(item => `
       <header class="header" style="margin-bottom: 40px;">
         <div class="gallery__card">
-          <img src="${item.image_url}" alt="${item.description}" style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;">
-          <div class="gallery__card--text">
+          <div class="gallery__card--image" style="width: 50%;">
+            <img src="${item.image_url}" 
+                 alt="${item.description}" 
+                 onclick="openLightbox('${item.image_url}')" 
+                 style="max-width: 100%; height: auto; border-radius: 8px; cursor: pointer;" 
+                 title="Click to enlarge">
+          </div>
+          <div class="gallery__card--text" style="width: 50%;">
             <h2 class="gallery__username">${item.discord_username}</h2>
             <p class="gallery__description">${item.description}</p>
           </div>
@@ -235,6 +243,28 @@ window.loadGallery = loadGallery;
 // --- DOM INITIALIZATION ---
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Load gallery items on page start
-  loadGallery('gallery');
+  // Pass (category, containerElementId)
+  loadGallery('gallery', 'gallery-container');
+  loadGallery('bounty-board', 'bounty-board-container');
+  loadGallery('pets', 'pets-container');
+  loadGallery('misc', 'misc-container');
 });
+
+function openLightbox(src) {
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    if (lightbox && lightboxImg) {
+        lightboxImg.src = src;
+        lightbox.classList.add("active");
+    }
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById("lightbox");
+    if (lightbox) {
+        lightbox.classList.remove("active");
+    }
+}
+
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;

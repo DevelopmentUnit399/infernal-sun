@@ -61,6 +61,15 @@ section {
     width: 100%;
 }
 
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.left {
+    text-align: left;
+}
+
 .orange {
     color: orange !important;
 }
@@ -342,6 +351,11 @@ LANDING PAGE
 
 .header__content {
     width: 50vw;
+    text-align: center;
+}
+
+.header__content h1 {
+    text-align: center;
 }
 
 .header {
@@ -428,8 +442,8 @@ nav {
 }
 
 #main-logo {
-    width: 150px;
-    height: 50px;
+    width: 250px;
+    height: 100px;
 }
 
 .nav__link--list {
@@ -455,10 +469,6 @@ nav {
 GALLERY
 
 */
-
-#gallery {
-    padding-top: 100px;
-}
 
 .gallery__card {
     width: 100%;
@@ -495,4 +505,119 @@ GALLERY
 
 .gallery__image {
     width: 100%;
+}
+
+/* --- FULLSCREEN IMAGE LIGHTBOX --- */
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+}
+
+.lightbox.active {
+    display: flex;
+}
+
+.lightbox__img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
+}
+
+/*
+
+GALLERY PAGE
+
+*/
+
+.main {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 30px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.gallery__title {
+    padding-top: 50px;
+    text-align: left;
+    font-size: 30px;
+}
+
+.gallery__desc {
+    padding-bottom: 25px;
+}
+
+/*
+
+BOUNTY PAGE
+
+*/
+
+.bounty__title--text {
+    font-size: 30px;
+    padding-top: 50px;
+}
+
+.bounty__desc {
+    padding-bottom: 25px;
+}
+
+/*
+
+PETS PAGE
+
+*/
+
+.pets__title {
+    font-size: 30px;
+    padding-top: 50px;
+}
+
+.pets__desc {
+    padding-bottom: 25px;
+}
+
+/*
+
+MISC PAGE
+
+*/
+
+.misc__title {
+    font-size: 30px;
+    padding-top: 50px;
+}
+
+.misc__desc {
+    padding-bottom: 25px;
+}
+
+/*
+
+FOOTER PAGE
+
+*/
+
+.footer__content--image {
+    width: 250px;
+    height: 100px;
+}
+
+.footer__content {
+    height: 100px;
 }

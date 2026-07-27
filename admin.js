@@ -1,5 +1,6 @@
 const API_BASE = "https://infernalsun.firecloud-tech.com";
 let currentAdminKey = "";
+let currentCategoryFilter = 'all';
 
 // --- AUTH HANDLER ---
 
@@ -20,10 +21,8 @@ async function handleAdminAuth(event) {
     }
 
     try {
-        // Load data to test auth / populate grids
         await loadAllSubmissions();
 
-        // Reveal dashboard and hide auth modal
         const authModal = document.getElementById("auth-modal");
         const adminDash = document.getElementById("admin-dashboard");
         
@@ -82,7 +81,17 @@ async function loadPendingSubmissions() {
             return;
         }
 
-        container.innerHTML = items.map(item => renderAdminCard(item, false)).join('');
+        // Apply active category filter
+        const filteredItems = currentCategoryFilter === 'all' 
+            ? items 
+            : items.filter(item => item.category === currentCategoryFilter);
+
+        if (filteredItems.length === 0) {
+            container.innerHTML = `<p style='color: #666; padding: 10px;'>No pending submissions for "${currentCategoryFilter}".</p>`;
+            return;
+        }
+
+        container.innerHTML = filteredItems.map(item => renderAdminCard(item)).join('');
     } catch (err) {
         console.error("Error loading pending submissions:", err);
         throw err;
@@ -108,7 +117,17 @@ async function loadApprovedSubmissions() {
             return;
         }
 
-        container.innerHTML = items.map(item => renderAdminCard(item, true)).join('');
+        // Apply active category filter
+        const filteredItems = currentCategoryFilter === 'all' 
+            ? items 
+            : items.filter(item => item.category === currentCategoryFilter);
+
+        if (filteredItems.length === 0) {
+            container.innerHTML = `<p style='color: #666; padding: 10px;'>No approved submissions for "${currentCategoryFilter}".</p>`;
+            return;
+        }
+
+        container.innerHTML = filteredItems.map(item => renderAdminCard(item)).join('');
     } catch (err) {
         console.error("Error loading approved submissions:", err);
     }
@@ -116,41 +135,54 @@ async function loadApprovedSubmissions() {
 
 // --- UI CARD RENDERER ---
 
-function renderAdminCard(item, isApproved) {
-    return `
-        <div class="admin-card" id="card-${item.id}" style="background: white; border: 1px solid #e0e0e0; padding: 16px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
-                <img src="${item.image_url}" alt="Submission" style="width: 160px; height: 160px; object-fit: cover; border-radius: 6px;">
-                <div style="flex: 1; min-width: 200px;">
-                    <p style="margin: 0 0 6px 0;"><strong>User:</strong> ${item.discord_username}</p>
-                    <p style="margin: 0 0 6px 0;"><strong>Email:</strong> ${item.email}</p>
-                    <p style="margin: 0 0 10px 0;"><strong>Description:</strong> ${item.description || 'N/A'}</p>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label><strong>Category:</strong> </label>
-                        <select id="category-${item.id}" onchange="updateCategory(${item.id})" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc;">
-                            <option value="gallery" ${item.category === 'gallery' ? 'selected' : ''}>Gallery Page</option>
-                            <option value="pets" ${item.category === 'pets' ? 'selected' : ''}>Pet Page</option>
-                        </select>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        ${isApproved 
-                            ? `<button onclick="toggleApproval(${item.id}, false)" style="background: #e67e22; color: #fff; padding: 8px 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Unapprove / Hide</button>` 
-                            : `<button onclick="toggleApproval(${item.id}, true)" style="background: #2ecc71; color: #fff; padding: 8px 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Approve</button>`
-                        }
-                        <button onclick="deleteSubmission(${item.id})" style="background: #e74c3c; color: #fff; padding: 8px 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Delete & Purge R2</button>
-                    </div>
-                </div>
-            </div>
+function renderAdminCard(item) {
+  return `
+    <div class="submission-card" data-id="${item.id}" style="background: #ffffff !important; padding: 20px !important; border-radius: 12px !important; margin-bottom: 20px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; width: 100% !important; box-sizing: border-box !important; display: block !important;">
+      
+      <!-- TOP: IMAGE PREVIEW -->
+      <div style="width: 100%; margin-bottom: 16px; text-align: center;">
+        <img src="${item.image_url}" 
+             alt="Submission" 
+             onclick="openLightbox('${item.image_url}')" 
+             style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; cursor: pointer; display: block;" 
+             title="Click to enlarge">
+      </div>
+
+      <!-- BOTTOM: DETAILS & ACTIONS -->
+      <div style="width: 100%; box-sizing: border-box;">
+        <h3 style="margin: 0 0 10px 0; font-size: 1.15rem; color: #2c3e50;">Submission #${item.id}</h3>
+        <p style="margin: 6px 0; font-size: 0.9rem; color: #333;"><strong>User:</strong> ${item.discord_username}</p>
+        <p style="margin: 6px 0; font-size: 0.9rem; color: #333; word-break: break-all;"><strong>Email:</strong> ${item.email}</p>
+        <p style="margin: 6px 0; font-size: 0.9rem; color: #333;"><strong>Description:</strong> ${item.description || 'N/A'}</p>
+        
+        <div style="margin: 12px 0;">
+            <label style="display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; color: #555;">Category:</label>
+            <select onchange="updateCategory(${item.id}, this.value)" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; font-size: 0.9rem;">
+                <option value="gallery" ${item.category === 'gallery' ? 'selected' : ''}>Gallery Page</option>
+                <option value="bounty-board" ${item.category === 'bounty-board' ? 'selected' : ''}>Bounty Board Page</option>
+                <option value="pets" ${item.category === 'pets' ? 'selected' : ''}>Pet Page</option>
+                <option value="misc" ${item.category === 'misc' ? 'selected' : ''}>Misc Page</option>
+            </select>
         </div>
-    `;
+
+        <!-- ACTION BUTTONS -->
+        <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;">
+          ${
+            item.approved === 0
+              ? `<button onclick="approveSubmission(${item.id})" style="flex: 1; min-width: 120px; background: #2ecc71; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Approve</button>`
+              : `<button onclick="hideSubmission(${item.id})" style="flex: 1; min-width: 120px; background: #f39c12; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Hide Submission</button>`
+          }
+          <button onclick="deleteSubmission(${item.id})" style="flex: 1; min-width: 120px; background: #e74c3c; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Delete & Purge R2</button>
+        </div>
+      </div>
+
+    </div>
+  `;
 }
 
 // --- ACTIONS ---
 
-// 1. APPROVE / UNAPPROVE TOGGLE
-async function toggleApproval(id, approveStatus) {
+async function approveSubmission(id) {
     try {
         const res = await fetch(`${API_BASE}/api/admin/submissions/${id}`, {
             method: "PATCH",
@@ -158,25 +190,20 @@ async function toggleApproval(id, approveStatus) {
                 "Content-Type": "application/json",
                 "x-admin-key": currentAdminKey
             },
-            body: JSON.stringify({ approved: approveStatus })
+            body: JSON.stringify({ approved: 1 })
         });
 
         if (res.ok) {
             loadAllSubmissions();
         } else {
-            alert("Failed to update approval status.");
+            alert("Failed to approve submission.");
         }
     } catch (err) {
-        console.error("Error updating approval status:", err);
+        console.error("Error approving submission:", err);
     }
 }
 
-// 2. UPDATE CATEGORY
-async function updateCategory(id) {
-    const categorySelect = document.getElementById(`category-${id}`);
-    if (!categorySelect) return;
-    
-    const category = categorySelect.value;
+async function hideSubmission(id) {
     try {
         const res = await fetch(`${API_BASE}/api/admin/submissions/${id}`, {
             method: "PATCH",
@@ -184,7 +211,28 @@ async function updateCategory(id) {
                 "Content-Type": "application/json",
                 "x-admin-key": currentAdminKey
             },
-            body: JSON.stringify({ category })
+            body: JSON.stringify({ approved: 0 })
+        });
+
+        if (res.ok) {
+            loadAllSubmissions();
+        } else {
+            alert("Failed to hide submission.");
+        }
+    } catch (err) {
+        console.error("Error hiding submission:", err);
+    }
+}
+
+async function updateCategory(id, newCategory) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/submissions/${id}`, {
+            method: "PATCH",
+            headers: { 
+                "Content-Type": "application/json",
+                "x-admin-key": currentAdminKey
+            },
+            body: JSON.stringify({ category: newCategory })
         });
 
         if (!res.ok) alert("Failed to update category.");
@@ -193,7 +241,6 @@ async function updateCategory(id) {
     }
 }
 
-// 3. DELETE SUBMISSION & PURGE FROM R2
 async function deleteSubmission(id) {
     if (!confirm("Are you sure you want to delete this submission? This will permanently delete the image file from Cloudflare R2.")) {
         return;
@@ -215,15 +262,60 @@ async function deleteSubmission(id) {
     }
 }
 
+// --- CATEGORY FILTER HANDLER ---
+
+function filterAdminCategory(category, evt) {
+    currentCategoryFilter = category;
+    
+    // Update active tab styles
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.style.background = '#fff';
+        btn.style.color = '#333';
+        btn.style.border = '1px solid #ccc';
+    });
+
+    const targetBtn = evt ? evt.target : event?.target;
+    if (targetBtn) {
+        targetBtn.style.background = '#2c3e50';
+        targetBtn.style.color = '#fff';
+        targetBtn.style.border = 'none';
+    }
+
+    loadAllSubmissions();
+}
+
+// --- LIGHTBOX UTILITIES ---
+
+function openLightbox(src) {
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    if (lightbox && lightboxImg) {
+        lightboxImg.src = src;
+        lightbox.classList.add("active");
+    }
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById("lightbox");
+    if (lightbox) {
+        lightbox.classList.remove("active");
+    }
+}
+
 // --- GLOBAL SCOPE EXPORTS ---
+
 window.handleAdminAuth = handleAdminAuth;
-window.toggleApproval = toggleApproval;
+window.approveSubmission = approveSubmission;
+window.hideSubmission = hideSubmission;
 window.updateCategory = updateCategory;
 window.deleteSubmission = deleteSubmission;
+window.filterAdminCategory = filterAdminCategory;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
 
 // --- INITIALIZATION ---
+
 document.addEventListener("DOMContentLoaded", () => {
-    // If auth modal isn't present, try loading directly
     const authModal = document.getElementById("auth-modal");
     if (!authModal) {
         loadAllSubmissions();
