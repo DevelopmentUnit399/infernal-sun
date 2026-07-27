@@ -181,7 +181,7 @@ async function handleUpload(event) {
   }
 }
 
-// --- PUBLIC GALLERY LOADER (LIMITED TO 5 MOST RECENT) ---
+// --- PUBLIC GALLERY LOADER (GRID LAYOUT + 5 RECENT LIMIT) ---
 
 async function loadGallery(category = 'gallery', containerId = 'gallery-container') {
   const container = document.getElementById(containerId);
@@ -193,7 +193,7 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
 
     if (!Array.isArray(items) || items.length === 0) {
       container.innerHTML = `
-        <div class="admin-card" style="text-align: center; padding: 20px; color: #888;">
+        <div style="text-align: center; padding: 20px; color: #888; width: 100%;">
           No submissions approved yet for this section.
         </div>`;
       return;
@@ -212,43 +212,48 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
         : "";
 
       return `
-        <div class="admin-card" style="display: flex; gap: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; align-items: center;">
-          <div class="admin-card__image" style="flex: 0 0 150px;">
+        <div class="gallery-card" style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
             <img src="${item.image_url}" 
                  alt="${item.description || 'Artwork'}" 
                  onclick="openLightbox('${item.image_url}')" 
-                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; cursor: pointer;" 
+                 style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;" 
                  title="Click to enlarge">
           </div>
-          <div class="admin-card__details" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h3 style="margin: 0; color: #fff; font-size: 1.2rem;">${item.discord_username}</h3>
-              ${uploadDate ? `<span style="font-size: 0.85rem; color: #888;">${uploadDate}</span>` : ''}
-            </div>
-            <p style="margin: 0; color: #ccc; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
+          <div style="width: 100%;">
+            <h3 style="margin: 0 0 6px 0; color: #2c3e50; font-size: 1.15rem; font-weight: bold;">${item.discord_username}</h3>
+            ${uploadDate ? `<div style="font-size: 0.85rem; color: #888; margin-bottom: 10px; font-style: italic;">${uploadDate}</div>` : ''}
+            <p style="margin: 0; color: #444; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
           </div>
         </div>
       `;
     }).join('');
 
-    // Append "View All" button if there are more than 5 submissions
+    // Responsive grid wrapper (matches layout across section containers)
+    const gridWrapper = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; max-width: 1200px; margin: 0 auto 25px auto; padding: 0 20px; box-sizing: border-box;">
+        ${cardsHtml}
+      </div>
+    `;
+
+    // Dynamic "View All" link targeting the exact section category
     const viewAllLink = items.length > 5 
-      ? `<div style="text-align: center; margin-top: 15px;">
-           <a href="gallery.html?category=${category}" class="btn" style="display: inline-block; padding: 10px 20px; background: #f39c12; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">
+      ? `<div style="text-align: center; margin-top: 20px; margin-bottom: 40px;">
+           <a href="gallery.html?category=${category}" class="btn click" style="display: inline-block; padding: 12px 24px; background: orange; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">
              View All Submissions (${items.length}) &rarr;
            </a>
          </div>`
       : '';
 
-    container.innerHTML = cardsHtml + viewAllLink;
+    container.innerHTML = gridWrapper + viewAllLink;
 
   } catch (err) {
-    console.error("Error loading gallery:", err);
-    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load gallery images.</p>`;
+    console.error(`Error loading ${category} section:`, err);
+    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load section items.</p>`;
   }
 }
 
-// --- FULL GALLERY LOADER (UNLIMITED) ---
+// --- FULL GALLERY LOADER (GRID LAYOUT - UNLIMITED) ---
 
 async function loadFullGallery(category = 'gallery', containerId = 'full-gallery-container') {
   const container = document.getElementById(containerId);
@@ -260,13 +265,13 @@ async function loadFullGallery(category = 'gallery', containerId = 'full-gallery
 
     if (!Array.isArray(items) || items.length === 0) {
       container.innerHTML = `
-        <div class="admin-card" style="text-align: center; padding: 20px; color: #888;">
+        <div style="text-align: center; padding: 20px; color: #888;">
           No submissions found for this category.
         </div>`;
       return;
     }
 
-    container.innerHTML = items.map(item => {
+    const cardsHtml = items.map(item => {
       const uploadDate = item.created_at 
         ? new Date(item.created_at).toLocaleDateString("en-US", {
             year: "numeric",
@@ -276,24 +281,43 @@ async function loadFullGallery(category = 'gallery', containerId = 'full-gallery
         : "";
 
       return `
-        <div class="admin-card" style="display: flex; gap: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; align-items: center;">
-          <div class="admin-card__image" style="flex: 0 0 150px;">
+        <div class="gallery-card" style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
             <img src="${item.image_url}" 
                  alt="${item.description || 'Artwork'}" 
                  onclick="openLightbox('${item.image_url}')" 
-                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; cursor: pointer;" 
+                 style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;" 
                  title="Click to enlarge">
           </div>
-          <div class="admin-card__details" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h3 style="margin: 0; color: #fff; font-size: 1.2rem;">${item.discord_username}</h3>
-              ${uploadDate ? `<span style="font-size: 0.85rem; color: #888;">${uploadDate}</span>` : ''}
-            </div>
-            <p style="margin: 0; color: #ccc; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
+          <div style="width: 100%;">
+            <h3 style="margin: 0 0 6px 0; color: #2c3e50; font-size: 1.15rem; font-weight: bold;">${item.discord_username}</h3>
+            ${uploadDate ? `<div style="font-size: 0.85rem; color: #888; margin-bottom: 10px; font-style: italic;">${uploadDate}</div>` : ''}
+            <p style="margin: 0; color: #444; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
           </div>
         </div>
       `;
     }).join('');
+
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; margin-bottom: 25px;">
+        ${cardsHtml}
+      </div>
+    `;
+
+  } catch (err) {
+    console.error("Error loading full gallery:", err);
+    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load submissions.</p>`;
+  }
+}
+
+window.loadFullGallery = loadFullGallery;
+
+    // Grid container wrapper for side-by-side arrangement
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; margin-bottom: 25px;">
+        ${cardsHtml}
+      </div>
+    `;
 
   } catch (err) {
     console.error("Error loading full gallery:", err);
