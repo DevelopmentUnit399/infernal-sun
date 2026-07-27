@@ -113,36 +113,28 @@ async function handleUpload(event) {
   try {
     if (uploadBtn) {
       uploadBtn.disabled = true;
-      uploadBtn.textContent = "Processing...";
+      uploadBtn.textContent = "Uploading...";
     }
     if (statusText) {
       statusText.style.color = "#e67e22";
-      statusText.textContent = "Generating secure upload link...";
+      statusText.textContent = "Uploading file to server...";
     }
 
-    // 1. Get Presigned URL from Backend
-    console.log("Fetching presigned upload URL...");
-    const presignRes = await fetch(`${API_BASE}/api/get-upload-url`, {
+    // 1. Prepare Multipart Form Data for Direct Server Upload
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", category);
+
+    // 2. Upload file through Express Backend Proxy (Bypasses Browser CORS)
+    console.log("Uploading file via backend proxy...");
+    const uploadRes = await fetch(`${API_BASE}/api/upload-direct`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileType: file.type, category })
+      body: formData
     });
 
-    if (!presignRes.ok) throw new Error("Failed to generate upload link.");
-    const { uploadUrl, publicImageUrl } = await presignRes.json();
-    console.log("Presigned URL received:", publicImageUrl);
-
-    // 2. Upload file directly to Cloudflare R2
-    if (statusText) statusText.textContent = "Uploading image to R2 storage...";
-    console.log("Uploading file to Cloudflare R2...");
-    const uploadRes = await fetch(uploadUrl, {
-      method: "PUT",
-      headers: { "Content-Type": file.type },
-      body: file
-    });
-
-    if (!uploadRes.ok) throw new Error("Image upload to Cloudflare R2 failed.");
-    console.log("R2 Upload complete!");
+    if (!uploadRes.ok) throw new Error("Failed to upload image to server.");
+    const { image_url } = await uploadRes.json();
+    console.log("Server upload complete! Image URL:", image_url);
 
     // 3. Save submission record to Database
     if (statusText) statusText.textContent = "Saving submission details...";
@@ -155,7 +147,7 @@ async function handleUpload(event) {
         email,
         description,
         category,
-        image_url: publicImageUrl
+        image_url
       })
     });
 
