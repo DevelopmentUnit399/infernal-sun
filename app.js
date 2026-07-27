@@ -212,7 +212,7 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
         : "";
 
       return `
-        <div class="gallery-card" style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div class="gallery-card" style="background: transparent; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
           <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
             <img src="${item.image_url}" 
                  alt="${item.description || 'Artwork'}" 
@@ -221,9 +221,9 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
                  title="Click to enlarge">
           </div>
           <div style="width: 100%;">
-            <h3 style="margin: 0 0 6px 0; color: #2c3e50; font-size: 1.15rem; font-weight: bold;">${item.discord_username}</h3>
-            ${uploadDate ? `<div style="font-size: 0.85rem; color: #888; margin-bottom: 10px; font-style: italic;">${uploadDate}</div>` : ''}
-            <p style="margin: 0; color: #444; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
+            <h3 style="margin: 0 0 6px 0; color: inherit; font-size: 1.15rem; font-weight: bold;">${item.discord_username}</h3>
+            ${uploadDate ? `<div style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 10px; font-style: italic;">${uploadDate}</div>` : ''}
+            <p style="margin: 0; opacity: 0.9; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
           </div>
         </div>
       `;
@@ -281,7 +281,7 @@ async function loadFullGallery(category = 'gallery', containerId = 'full-gallery
         : "";
 
       return `
-        <div class="gallery-card" style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <div class="gallery-card" style="background: transparent; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
           <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
             <img src="${item.image_url}" 
                  alt="${item.description || 'Artwork'}" 
@@ -290,9 +290,9 @@ async function loadFullGallery(category = 'gallery', containerId = 'full-gallery
                  title="Click to enlarge">
           </div>
           <div style="width: 100%;">
-            <h3 style="margin: 0 0 6px 0; color: #2c3e50; font-size: 1.15rem; font-weight: bold;">${item.discord_username}</h3>
-            ${uploadDate ? `<div style="font-size: 0.85rem; color: #888; margin-bottom: 10px; font-style: italic;">${uploadDate}</div>` : ''}
-            <p style="margin: 0; color: #444; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
+            <h3 style="margin: 0 0 6px 0; color: inherit; font-size: 1.15rem; font-weight: bold;">${item.discord_username}</h3>
+            ${uploadDate ? `<div style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 10px; font-style: italic;">${uploadDate}</div>` : ''}
+            <p style="margin: 0; opacity: 0.9; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
           </div>
         </div>
       `;
