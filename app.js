@@ -181,9 +181,7 @@ async function handleUpload(event) {
   }
 }
 
-// --- PUBLIC GALLERY LOADER ---
-
-// --- PUBLIC GALLERY LOADER ---
+// --- PUBLIC GALLERY LOADER (LIMITED TO 5 MOST RECENT) ---
 
 async function loadGallery(category = 'gallery', containerId = 'gallery-container') {
   const container = document.getElementById(containerId);
@@ -195,35 +193,115 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
 
     if (!Array.isArray(items) || items.length === 0) {
       container.innerHTML = `
-        <header class="header">
-          <p style="text-align: center; width: 100%; color: #888; padding: 20px;">No submissions approved yet for this section.</p>
-        </header>`;
+        <div class="admin-card" style="text-align: center; padding: 20px; color: #888;">
+          No submissions approved yet for this section.
+        </div>`;
       return;
     }
 
-    container.innerHTML = items.map(item => `
-      <header class="header" style="margin-bottom: 40px;">
-        <div class="gallery__card">
-          <div class="gallery__card--image" style="width: 50%;">
+    // Limit display to the 5 most recent submissions
+    const recentItems = items.slice(0, 5);
+
+    const cardsHtml = recentItems.map(item => {
+      const uploadDate = item.created_at 
+        ? new Date(item.created_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          })
+        : "";
+
+      return `
+        <div class="admin-card" style="display: flex; gap: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; align-items: center;">
+          <div class="admin-card__image" style="flex: 0 0 150px;">
             <img src="${item.image_url}" 
-                 alt="${item.description}" 
+                 alt="${item.description || 'Artwork'}" 
                  onclick="openLightbox('${item.image_url}')" 
-                 style="max-width: 100%; height: auto; border-radius: 8px; cursor: pointer;" 
+                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; cursor: pointer;" 
                  title="Click to enlarge">
           </div>
-          <div class="gallery__card--text" style="width: 50%;">
-            <h2 class="gallery__username">${item.discord_username}</h2>
-            <p class="gallery__description">${item.description}</p>
+          <div class="admin-card__details" style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="margin: 0; color: #fff; font-size: 1.2rem;">${item.discord_username}</h3>
+              ${uploadDate ? `<span style="font-size: 0.85rem; color: #888;">${uploadDate}</span>` : ''}
+            </div>
+            <p style="margin: 0; color: #ccc; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
           </div>
         </div>
-      </header>
-    `).join('');
+      `;
+    }).join('');
+
+    // Append "View All" button if there are more than 5 submissions
+    const viewAllLink = items.length > 5 
+      ? `<div style="text-align: center; margin-top: 15px;">
+           <a href="gallery.html?category=${category}" class="btn" style="display: inline-block; padding: 10px 20px; background: #f39c12; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">
+             View All Submissions (${items.length}) &rarr;
+           </a>
+         </div>`
+      : '';
+
+    container.innerHTML = cardsHtml + viewAllLink;
 
   } catch (err) {
     console.error("Error loading gallery:", err);
     container.innerHTML = `<p style="text-align: center; color: red;">Failed to load gallery images.</p>`;
   }
 }
+
+// --- FULL GALLERY LOADER (UNLIMITED) ---
+
+async function loadFullGallery(category = 'gallery', containerId = 'full-gallery-container') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/api/gallery?category=${category}`);
+    const items = await response.json();
+
+    if (!Array.isArray(items) || items.length === 0) {
+      container.innerHTML = `
+        <div class="admin-card" style="text-align: center; padding: 20px; color: #888;">
+          No submissions found for this category.
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = items.map(item => {
+      const uploadDate = item.created_at 
+        ? new Date(item.created_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          })
+        : "";
+
+      return `
+        <div class="admin-card" style="display: flex; gap: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; align-items: center;">
+          <div class="admin-card__image" style="flex: 0 0 150px;">
+            <img src="${item.image_url}" 
+                 alt="${item.description || 'Artwork'}" 
+                 onclick="openLightbox('${item.image_url}')" 
+                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; cursor: pointer;" 
+                 title="Click to enlarge">
+          </div>
+          <div class="admin-card__details" style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="margin: 0; color: #fff; font-size: 1.2rem;">${item.discord_username}</h3>
+              ${uploadDate ? `<span style="font-size: 0.85rem; color: #888;">${uploadDate}</span>` : ''}
+            </div>
+            <p style="margin: 0; color: #ccc; font-size: 0.95rem; line-height: 1.4;">${item.description || 'No description provided.'}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    console.error("Error loading full gallery:", err);
+    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load submissions.</p>`;
+  }
+}
+
+window.loadFullGallery = loadFullGallery;
 
 // --- GLOBAL SCOPE EXPORTS ---
 window.openModal = openModal;

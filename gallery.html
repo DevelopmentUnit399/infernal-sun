@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Gallery - Infernal Sun</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="header" style="text-align: center; padding: 30px 20px;">
+    <h1 id="gallery-title" style="color: #fff; margin-bottom: 10px;">Full Submissions Gallery</h1>
+    <a href="index.html" style="color: #f39c12; text-decoration: none;">&larr; Back to Main Page</a>
+  </header>
+
+  <main style="max-width: 900px; margin: 0 auto; padding: 0 20px 40px;">
+    <div id="full-gallery-container"></div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Parse category parameter from URL (e.g., gallery.html?category=pets)
+      const urlParams = new URLSearchParams(window.location.search);
+      const category = urlParams.get('category') || 'gallery';
+
+      // Update title heading
+      const titleElem = document.getElementById("gallery-title");
+      if (titleElem) {
+        titleElem.textContent = category.charAt(0).toUpperCase() + category.slice(1) + " - All Submissions";
+      }
+
+      // Load ALL submissions into full-gallery-container
+      loadFullGallery(category, 'full-gallery-container');
+    });
+  </script>
+</body>
+</html>

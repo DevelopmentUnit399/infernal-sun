@@ -562,6 +562,13 @@ GALLERY PAGE
     padding-bottom: 25px;
 }
 
+.gallery__date {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
 /*
 
 BOUNTY PAGE
