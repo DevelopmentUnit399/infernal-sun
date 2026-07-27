@@ -6,31 +6,42 @@
   <title>Full Gallery - Infernal Sun</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body style="background-color: rgb(245, 245, 245); padding-top: 30px;">
 
-  <header class="header" style="text-align: center; padding: 30px 20px;">
-    <h1 id="gallery-title" style="color: #fff; margin-bottom: 10px;">Full Submissions Gallery</h1>
-    <a href="index.html" style="color: #f39c12; text-decoration: none;">&larr; Back to Main Page</a>
+  <header class="header" style="text-align: center; padding: 20px; display: block;">
+    <h1 id="gallery-title" style="color: #2c3e50; font-size: 2.2rem; margin-bottom: 10px; text-align: center;">Full Submissions Gallery</h1>
+    <a href="index.html" class="orange" style="font-size: 1.1rem; text-decoration: none; font-weight: bold;">&larr; Back to Main Page</a>
   </header>
 
-  <main style="max-width: 1200px; margin: 0 auto; padding: 0 20px 40px;">
-  <div id="full-gallery-container"></div>
-</main>
+  <main style="max-width: 1200px; margin: 30px auto 0 auto; padding: 0 20px 40px;">
+    <div id="full-gallery-container"></div>
+  </main>
 
   <script src="app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Parse category parameter from URL (e.g., gallery.html?category=pets)
+      // Parse category parameter from URL (e.g., gallery.html?category=bounty-board)
       const urlParams = new URLSearchParams(window.location.search);
       const category = urlParams.get('category') || 'gallery';
 
-      // Update title heading
+      // Map raw category IDs to friendly display names
+      const categoryNames = {
+        'gallery': 'General Gallery',
+        'bounty-board': 'Bounty Board',
+        'pets': 'Pets Showcase',
+        'misc': 'Miscellaneous'
+      };
+
+      // Get human-readable title or fallback to capitalized parameter string
+      const displayName = categoryNames[category] || (category.charAt(0).toUpperCase() + category.slice(1));
+
+      // Update the title heading text
       const titleElem = document.getElementById("gallery-title");
       if (titleElem) {
-        titleElem.textContent = category.charAt(0).toUpperCase() + category.slice(1) + " - All Submissions";
+        titleElem.textContent = `${displayName} - All Submissions`;
       }
 
-      // Load ALL submissions into full-gallery-container
+      // Load ALL submissions for this category into full-gallery-container
       loadFullGallery(category, 'full-gallery-container');
     });
   </script>
