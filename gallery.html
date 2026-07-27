@@ -8,7 +8,7 @@
 </head>
 <body style="background-color: rgb(245, 245, 245); padding: 40px 20px;">
 
-  <!-- Simple Header Container (No CSS flexbox conflicts) -->
+  <!-- Simple Header Container -->
   <div style="text-align: center; max-width: 1200px; margin: 0 auto 30px auto;">
     <h1 id="gallery-title" style="color: #2c3e50; font-size: 2.2rem; font-weight: bold; margin-bottom: 12px; display: block;">
       Full Submissions Gallery
@@ -24,14 +24,17 @@
     <div id="full-gallery-container"></div>
   </main>
 
+  <!-- GLOBAL LIGHTBOX MODAL -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" class="lightbox__img" src="" alt="Enlarged View">
+  </div>
+
   <script src="app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Parse category parameter from URL (e.g., gallery.html?category=bounty-board)
       const urlParams = new URLSearchParams(window.location.search);
       const category = urlParams.get('category') || 'gallery';
 
-      // Map raw category IDs to friendly display names
       const categoryNames = {
         'gallery': 'General Gallery',
         'bounty-board': 'Bounty Board',
@@ -39,16 +42,13 @@
         'misc': 'Miscellaneous'
       };
 
-      // Get human-readable title or fallback to capitalized parameter string
       const displayName = categoryNames[category] || (category.charAt(0).toUpperCase() + category.slice(1));
 
-      // Update the title heading text
       const titleElem = document.getElementById("gallery-title");
       if (titleElem) {
         titleElem.textContent = `${displayName} - All Submissions`;
       }
 
-      // Load ALL submissions for this category into full-gallery-container
       loadFullGallery(category, 'full-gallery-container');
     });
   </script>
