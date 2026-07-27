@@ -310,22 +310,23 @@ async function loadFullGallery(category = 'gallery', containerId = 'full-gallery
   }
 }
 
-window.loadFullGallery = loadFullGallery;
+// --- LIGHTBOX UTILITIES ---
 
-    // Grid container wrapper for side-by-side arrangement
-    container.innerHTML = `
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; margin-bottom: 25px;">
-        ${cardsHtml}
-      </div>
-    `;
-
-  } catch (err) {
-    console.error("Error loading full gallery:", err);
-    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load submissions.</p>`;
+function openLightbox(src) {
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightbox-img");
+  if (lightbox && lightboxImg) {
+    lightboxImg.src = src;
+    lightbox.classList.add("active");
   }
 }
 
-window.loadFullGallery = loadFullGallery;
+function closeLightbox() {
+  const lightbox = document.getElementById("lightbox");
+  if (lightbox) {
+    lightbox.classList.remove("active");
+  }
+}
 
 // --- GLOBAL SCOPE EXPORTS ---
 window.openModal = openModal;
@@ -333,6 +334,9 @@ window.closeModal = closeModal;
 window.handleAuth = handleAuth;
 window.handleUpload = handleUpload;
 window.loadGallery = loadGallery;
+window.loadFullGallery = loadFullGallery;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
 
 // --- DOM INITIALIZATION ---
 
@@ -343,22 +347,3 @@ document.addEventListener("DOMContentLoaded", () => {
   loadGallery('pets', 'pets-container');
   loadGallery('misc', 'misc-container');
 });
-
-function openLightbox(src) {
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById("lightbox-img");
-    if (lightbox && lightboxImg) {
-        lightboxImg.src = src;
-        lightbox.classList.add("active");
-    }
-}
-
-function closeLightbox() {
-    const lightbox = document.getElementById("lightbox");
-    if (lightbox) {
-        lightbox.classList.remove("active");
-    }
-}
-
-window.openLightbox = openLightbox;
-window.closeLightbox = closeLightbox;
