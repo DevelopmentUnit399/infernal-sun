@@ -253,30 +253,6 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
   }
 }
 
-    // Responsive grid wrapper (matches layout across section containers)
-    const gridWrapper = `
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; max-width: 1200px; margin: 0 auto 25px auto; padding: 0 20px; box-sizing: border-box;">
-        ${cardsHtml}
-      </div>
-    `;
-
-    // Dynamic "View All" link targeting the exact section category
-    const viewAllLink = items.length > 5 
-      ? `<div style="text-align: center; margin-top: 20px; margin-bottom: 40px;">
-           <a href="gallery.html?category=${category}" class="btn click" style="display: inline-block; padding: 12px 24px; background: orange; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">
-             View All Submissions (${items.length}) &rarr;
-           </a>
-         </div>`
-      : '';
-
-    container.innerHTML = gridWrapper + viewAllLink;
-
-  } catch (err) {
-    console.error(`Error loading ${category} section:`, err);
-    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load section items.</p>`;
-  }
-}
-
 // --- FULL GALLERY LOADER (GRID LAYOUT - UNLIMITED) ---
 
 async function loadFullGallery(category = 'gallery', containerId = 'full-gallery-container') {
