@@ -181,7 +181,7 @@ async function handleUpload(event) {
   }
 }
 
-// --- PUBLIC GALLERY LOADER (GRID LAYOUT + 5 RECENT LIMIT) ---
+// --- PUBLIC GALLERY LOADER (GRID LAYOUT + 6 RECENT LIMIT) ---
 
 async function loadGallery(category = 'gallery', containerId = 'gallery-container') {
   const container = document.getElementById(containerId);
@@ -199,8 +199,8 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
       return;
     }
 
-    // Limit display to the 5 most recent submissions
-    const recentItems = items.slice(0, 5);
+    // Limit display to the 6 most recent submissions
+    const recentItems = items.slice(0, 6);
 
     const cardsHtml = recentItems.map(item => {
       const uploadDate = item.created_at 
@@ -228,6 +228,30 @@ async function loadGallery(category = 'gallery', containerId = 'gallery-containe
         </div>
       `;
     }).join('');
+
+    // Responsive grid wrapper
+    const gridWrapper = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; max-width: 1200px; margin: 0 auto 25px auto; padding: 0 20px; box-sizing: border-box;">
+        ${cardsHtml}
+      </div>
+    `;
+
+    // Dynamic "View All" link triggers if there are more than 6 submissions
+    const viewAllLink = items.length > 6 
+      ? `<div style="text-align: center; margin-top: 20px; margin-bottom: 40px;">
+           <a href="gallery.html?category=${category}" class="btn click" style="display: inline-block; padding: 12px 24px; background: orange; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">
+             View All Submissions (${items.length}) &rarr;
+           </a>
+         </div>`
+      : '';
+
+    container.innerHTML = gridWrapper + viewAllLink;
+
+  } catch (err) {
+    console.error(`Error loading ${category} section:`, err);
+    container.innerHTML = `<p style="text-align: center; color: red;">Failed to load section items.</p>`;
+  }
+}
 
     // Responsive grid wrapper (matches layout across section containers)
     const gridWrapper = `
