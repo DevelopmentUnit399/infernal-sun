@@ -342,11 +342,11 @@ LANDING PAGE
 */
 
 #landing-page {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
+    padding-bottom: 60px;
 }
 
 .header__content {
@@ -376,16 +376,20 @@ LANDING PAGE
 .header__image img {
     width: 100%;
     height: auto;
+    max-height: 40vh;
+    object-fit: contain;
     display: block;
 }
 
 .title {
     width: 100%;
     max-width: 100%;
+    font-size: clamp(2rem, 5vh, 4.5rem);
 }
 
 .header__para {
     width: 100%;
+    font-size: clamp(1rem, 2.5vh, 1.25rem);
 }
 
 .scroll {
