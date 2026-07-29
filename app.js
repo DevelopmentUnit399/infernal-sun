@@ -1,7 +1,7 @@
 const TEAM_PASSWORD = "CalamityAshe";
 const API_BASE = "https://infernalsun.firecloud-tech.com";
 let isModalOpen = false
-let contrastToggle = false
+let contrastToggle = true
 const scaleFactor = 1 / 20
 
 function moveBackground(event) {
