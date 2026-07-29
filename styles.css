@@ -7,6 +7,11 @@
     font-family: "Roboto", sans-serif;
 }
 
+body {
+    background-color: rgb(245, 245, 245);
+    transition: background-color 400ms ease;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -24,16 +29,15 @@ a {
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
 button {
     cursor: pointer;
 }
 
 section {
-    background-color: rgb(245, 245, 245);
+    background-color: transparent !important;
+    padding: 60px 0;
+    position: relative;
+    z-index: 5;
 }
 
 .click {
@@ -72,6 +76,37 @@ section {
 
 .orange {
     color: orange !important;
+}
+
+.link__hover-effect {
+    position: relative;
+}
+
+.link__hover-effect:after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    height: 3px;
+    width: 0;
+    right: 0;
+    transition: all 300ms ease;
+}
+
+.link__hover-effect--white:after {
+    background-color: white;
+}
+
+.link__hover-effect--black:after {
+    background-color: #242424;
+}
+
+.link__hover-effect:hover:after {
+    left: 0;
+    width: 100%;
+}
+
+.nav__link--anchor, .header__content, .bounty__title--text, .bounty__desc, .gallery__title, .gallery__desc, .pets__title, .pets__desc, .misc__title, .misc__desc, .scroll__icon, .scroll__icon:after {
+    transition: color 400ms ease, border-color 400ms ease, background-color 400ms ease;
 }
 
 /*
@@ -335,6 +370,62 @@ UPLOAD FORM FIELD STYLING
     cursor: pointer;
 }
 
+.no__effect:after {
+    display: none !important;
+}
+
+.dark--theme {
+    background-color: #242424;
+}
+
+.dark--theme #landing-page, .dark--theme #bounty, .dark--theme #gallery, .dark--theme #pets, .dark--theme #misc {
+    background-color: transparent;
+}
+
+.dark--theme #footer {
+    background-color: #242424;
+}
+
+.gallery__card, .gallery-card h3, .gallery-card p, .gallery-card div {
+    transition: all 400ms ease;
+}
+
+.dark--theme .gallery-card {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark--theme .gallery-card h3 {
+    color: #ffffff !important;
+}
+
+.dark--theme .gallery-card p {
+    color: #e0e0e0 !important;
+}
+
+.dark--theme .gallery-card div {
+    color: #aaaaaa !important;
+}
+
+.dark--theme .gallery-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.dark--theme .nav__link--anchor, .dark--theme .header__content, .dark--theme .bounty__title--text, .dark--theme .bounty__desc, .dark--theme .gallery__title, .dark--theme .gallery__desc, .dark--theme .pets__title, .dark--theme .pets__desc, .dark--theme .misc__title, .dark--theme .misc__desc, .dark--theme .bounty__cards {
+    color: white;
+}
+
+.dark--theme .scroll__icon {
+    border-color: white;
+}
+
+.dark--theme .scroll__icon:after {
+    background-color: white;
+}
+
+.dark--theme .link__hover-effect:hover:after {
+    background-color: white;
+}
+
 /*
 
 LANDING PAGE
@@ -342,11 +433,12 @@ LANDING PAGE
 */
 
 #landing-page {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     position: relative;
-    padding-bottom: 60px;
+    overflow: hidden;
+    padding-top: 0;
 }
 
 .header__content {
@@ -367,16 +459,22 @@ LANDING PAGE
     justify-content: space-between;
     align-items: center;
     gap: 20px;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    z-index: 10;
 }
 
 .header__content, .header__image {
     width: 50%;
+    max-height: 100%;
 }
 
 .header__image img {
     width: 100%;
-    height: auto;
-    max-height: 40vh;
+    height: 100%;
+    max-height: 65vh;
+    border-radius: 12px;
     object-fit: contain;
     display: block;
 }
@@ -443,6 +541,8 @@ nav {
     margin: 0 auto;
     height: 100px;
     padding: 0 20px;
+    position: relative;
+    z-index: 10;
 }
 
 #main-logo {
@@ -624,6 +724,10 @@ FOOTER PAGE
 
 */
 
+#footer {
+    background-color: #242424 !important;
+}
+
 .footer__content--image {
     width: 200px;
     height: 85px;
@@ -634,16 +738,94 @@ FOOTER PAGE
     flex-direction: column;
     height: 200px;
     justify-content: space-evenly;
+    color: white;
+    font-weight: 400;
 }
 
 .footer__link--list {
     display: flex;
     gap: 15px;
     text-decoration: none;
+    color: white;
+}
+
+.footer__link a {
+    color: white;
+    font-weight: 400;
 }
 
 .footer__copyright {
     font-size: 10px;
+}
+
+.footer__copyright--text {
+    font-weight: 200;
+}
+
+/*
+
+SHAPES
+
+*/
+
+.shape {
+    position: fixed;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.shape__overwatch {
+    width: 60px;
+    height: auto;
+}
+
+.shape--0 {
+    top: 15vh;
+    left: 5vw;
+}
+
+.shape--1 {
+    top: 15vh;
+    left: 50vw;
+}
+
+.shape--2 {
+    top: 15vh;
+    left: 80vw;
+}
+
+.shape--3 {
+    top: 50vh;
+    left: 5vw;
+}
+
+.shape--4 {
+    top: 50vh;
+    left: 50vw;
+}
+
+.shape--5 {
+    top: 50vh;
+    left: 80vw;
+}
+
+.shape--6 {
+    top: 80vh;
+    left: 5vw;
+}
+
+.shape--7 {
+    top: 80vh;
+    left: 50vw;
+}
+
+.shape--8 {
+    top: 80vh;
+    left: 80vw;
+}
+
+#bounty, #gallery, #pets, #misc {
+    z-index: 10;
 }
 
 /*

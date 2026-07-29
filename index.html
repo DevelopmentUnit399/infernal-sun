@@ -68,8 +68,8 @@
         </div>
     </div>
 
-    <section id="landing-page">
-        <nav>
+    <section id="landing-page" onmousemove="moveBackground(event)">
+        <nav class="main__nav">
             <figure>
                 <img id="main-logo" src="assets/images/infernal-sun-icon.png" alt="">
             </figure>
@@ -93,7 +93,7 @@
                     <a href="#" onclick="openModal(); return false;" class="nav__link--anchor link__hover-effect link__hover-effect--black orange">Upload</a>
                 </li>
                 <li class="nav__link click">
-                    <a href="#bounty" class="nav__link--anchor link__hover-effect link__hover-effect--black"><i class="fa-solid fa-circle-half-stroke"></i></a>
+                    <a href="#" class="nav__link--anchor link__hover-effect link__hover-effect--black no__effect" onclick="toggleContrast()"><i class="fa-solid fa-circle-half-stroke"></i></a>
                 </li>
             </ul>
         </nav>
@@ -114,7 +114,7 @@
         </header>
     </section>
 
-    <section id="bounty">
+    <section id="bounty" onmousemove="moveBackground(event)">
         <div class="header column left">
             <h2 class="bounty__title--text">Bounty Submissions</h2>
             <p class="bounty__desc">Below is the gallery of all the bounty submissions that are uploaded and approved from all of <span class="orange">Infernal Sun!</span></p>
@@ -126,7 +126,7 @@
 
     <!-- GALLERY SECTION -->
 
-    <section id="gallery">
+    <section id="gallery" onmousemove="moveBackground(event)">
         <div class="main column left">
             <h2 class="gallery__title">Gallery Submissions</h2>
             <p class="gallery__desc">Below is the gallery of all the uploaded and approved artwork from all of the team of <span class="orange">Infernal Sun!</span></p>
@@ -136,7 +136,7 @@
         </div>
     </section>
 
-    <section id="pets">
+    <section id="pets" onmousemove="moveBackground(event)">
         <div class="main column left">
             <h2 class="pets__title">Pets Submissions</h2>
             <p class="pets__desc">Below is the gallery of all the cute pets from all of <span class="orange">Infernal Sun!</span></p>
@@ -146,7 +146,7 @@
         </div>
     </section>
 
-    <section id="misc">
+    <section id="misc" onmousemove="moveBackground(event)">
         <div class="main column left">
             <h2 class="misc__title">Misc Submissions</h2>
             <p class="misc__desc">Below is the gallery of all the miscellaneous submissions that are uploaded and approved from all of <span class="orange">Infernal Sun!</span></p>
@@ -156,32 +156,29 @@
         </div>
     </section>
 
-    <section id="footer">
+    <section id="footer" onmousemove="moveBackground(event)">
         <div class="main footer__content">
             <figure>
             <img class="footer__content--image" src="assets/images/infernal-sun-icon.png">
             </figure>
             <ul class="footer__link--list">
                 <li class="footer__link">
-                    <a href="#" class="nav__link--anchor link__hover-effect link__hover-effect--black">About</a>
+                    <a href="#" class="nav__link--anchor link__hover-effect link__hover-effect--white">About</a>
                 </li>
                 <li class="footer__link">
-                    <a href="#bounty" onclick="loadGallery('bounty-board', 'bounty-board-container')" class="nav__link--anchor link__hover-effect link__hover-effect--black">Bounty</a>
+                    <a href="#bounty" onclick="loadGallery('bounty-board', 'bounty-board-container')" class="nav__link--anchor link__hover-effect link__hover-effect--white">Bounty</a>
                 </li>
                 <li class="footer__link">
-                    <a href="#gallery" onclick="loadGallery('gallery', 'gallery-container')" class="nav__link--anchor link__hover-effect link__hover-effect--black">Gallery</a>
+                    <a href="#gallery" onclick="loadGallery('gallery', 'gallery-container')" class="nav__link--anchor link__hover-effect link__hover-effect--white">Gallery</a>
                 </li>
                 <li class="footer__link">
-                    <a href="#pets" onclick="loadGallery('pets', 'pets-container')" class="nav__link--anchor link__hover-effect link__hover-effect--black">Pets</a>
+                    <a href="#pets" onclick="loadGallery('pets', 'pets-container')" class="nav__link--anchor link__hover-effect link__hover-effect--white">Pets</a>
                 </li>
                 <li class="footer__link">
-                    <a href="#misc" onclick="loadGallery('misc', 'misc-container')" class="nav__link--anchor link__hover-effect link__hover-effect--black">Misc</a>
+                    <a href="#misc" onclick="loadGallery('misc', 'misc-container')" class="nav__link--anchor link__hover-effect link__hover-effect--white">Misc</a>
                 </li>
                 <li class="footer__link">
-                    <a href="#" onclick="openModal(); return false;" class="nav__link--anchor link__hover-effect link__hover-effect--black orange">Upload</a>
-                </li>
-                <li class="footer__link click">
-                    <a href="#" class="nav__link--anchor link__hover-effect link__hover-effect--black"><i class="fa-solid fa-circle-half-stroke"></i></a>
+                    <a href="#" onclick="openModal(); return false;" class="nav__link--anchor link__hover-effect link__hover-effect--white orange">Upload</a>
                 </li>
             </ul>
             <div class="footer__copyright">
@@ -194,5 +191,15 @@
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
         <img id="lightbox-img" class="lightbox__img" src="" alt="Enlarged View">
     </div>
+
+    <img src="assets/images/overwatch-icon.png" class="shape shape__overwatch shape--0">
+        <img src="assets/images/christalraine-icon.png" class="shape shape--1">
+        <img src="assets/images/overwatch-icon.png" class="shape shape__overwatch shape--2">
+        <img src="assets/images/christalraine-icon.png" class="shape shape--3">
+        <img src="assets/images/overwatch-icon.png" class="shape shape__overwatch shape--4">
+        <img src="assets/images/christalraine-icon.png" class="shape shape--5">
+        <img src="assets/images/overwatch-icon.png" class="shape shape__overwatch shape--6">
+        <img src="assets/images/christalraine-icon.png" class="shape shape--7">
+        <img src="assets/images/overwatch-icon.png" class="shape shape__overwatch shape--8">
 </body>
 </html>
